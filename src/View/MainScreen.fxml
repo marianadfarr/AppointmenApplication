@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="787.0" prefWidth="824.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MainFormController">
+   <children>
+      <HBox alignment="CENTER" layoutX="18.0" layoutY="23.0" prefHeight="63.0" prefWidth="357.0">
+         <children>
+            <Label prefHeight="43.0" prefWidth="353.0" text="Custumer Search">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <TextField alignment="TOP_LEFT" prefHeight="28.0" prefWidth="374.0" promptText="Enter A Customer Name" />
+            <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="71.0" text="Search" />
+         </children>
+      </HBox>
+      <HBox layoutX="442.0" layoutY="46.0" prefHeight="100.0" prefWidth="200.0">
+         <children>
+            <Label text="Today's Appointments:">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+      <TableView layoutX="10.0" layoutY="103.0" prefHeight="581.0" prefWidth="826.0">
+         <columns>
+            <TableColumn prefWidth="43.0" text="  ID" />
+            <TableColumn prefWidth="64.0" text="Title" />
+            <TableColumn prefWidth="144.0" text="Description" />
+            <TableColumn prefWidth="73.0" text="Location" />
+            <TableColumn minWidth="0.0" prefWidth="66.0" text="Contact" />
+            <TableColumn prefWidth="68.0" text="Type" />
+            <TableColumn prefWidth="115.0" text="Start Date/Time" />
+            <TableColumn prefWidth="111.0" text="End Date/Time" />
+            <TableColumn prefWidth="46.0" text="User ID" />
+            <TableColumn prefWidth="95.0" text="Customer ID" />
+         </columns>
+      </TableView>
+      <HBox alignment="CENTER" layoutX="69.0" layoutY="705.0" prefHeight="107.0" prefWidth="702.0" spacing="25.0">
+         <children>
+            <Button mnemonicParsing="false" prefHeight="38.0" prefWidth="202.0" text="Create New Appointment" />
+            <Button mnemonicParsing="false" text="Update Appointment" />
+            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="132.0" text="Go to Appointment" />
+            <Button layoutX="214.0" layoutY="52.0" mnemonicParsing="false" text="Delete Appointment" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

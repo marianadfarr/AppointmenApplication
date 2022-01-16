@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="958.0" prefWidth="728.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.CustumerScreen">
+   <children>
+      <TableView layoutY="88.0" prefHeight="598.0" prefWidth="740.0">
+         <columns>
+            <TableColumn prefWidth="84.0" text="Customer ID" />
+            <TableColumn prefWidth="84.0" text="Name" />
+            <TableColumn prefWidth="247.0" text="Address" />
+            <TableColumn prefWidth="88.0" text="Postal Code" />
+            <TableColumn minWidth="0.0" prefWidth="101.0" text="Phone Number" />
+            <TableColumn minWidth="0.0" prefWidth="78.0" text="Country" />
+            <TableColumn prefWidth="57.0" text="State/Province" />
+         </columns>
+      </TableView>
+      <HBox alignment="CENTER" layoutX="59.0" layoutY="695.0" prefHeight="107.0" prefWidth="702.0" spacing="25.0">
+         <children>
+            <Button mnemonicParsing="false" prefHeight="38.0" prefWidth="202.0" text="Create New Customer Record" />
+            <Button mnemonicParsing="false" text="Update Record" />
+            <Button layoutX="214.0" layoutY="52.0" mnemonicParsing="false" text="Delete Record" />
+         </children>
+      </HBox>
+      <HBox alignment="TOP_CENTER" layoutX="2.0" layoutY="16.0" prefHeight="78.0" prefWidth="318.0">
+         <children>
+            <Label prefHeight="17.0" prefWidth="267.0" text="All Customers" textAlignment="CENTER">
+               <font>
+                  <Font size="44.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

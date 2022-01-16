@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane prefHeight="765.0" prefWidth="831.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AddCustomerScreen">
+   <children>
+      <GridPane layoutX="39.0" layoutY="86.0" prefHeight="544.0" prefWidth="701.0">
+         <columnConstraints>
+            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <Label alignment="CENTER" text="Customer ID" />
+            <Label alignment="CENTER" text="Name" GridPane.rowIndex="1" />
+            <Label alignment="CENTER" text="Address" GridPane.rowIndex="2" />
+            <Label alignment="CENTER" text="Postal Code" GridPane.rowIndex="3" />
+            <Label prefHeight="17.0" prefWidth="83.0" text="Phone Number" GridPane.rowIndex="4" />
+            <Label fx:id="CompOrMachineID" alignment="CENTER" GridPane.rowIndex="5" />
+            <TextField fx:id="ModifyName" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="ModifyID" disable="true" editable="false" GridPane.columnIndex="1" />
+            <TextField fx:id="ModifyInventory" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="ModifyPrice" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="ModifyMax" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label prefHeight="20.0" prefWidth="129.0" text="Country" GridPane.rowIndex="5" />
+            <ComboBox prefHeight="31.0" prefWidth="213.0" promptText="Select Customer Country" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+         </children>
+      </GridPane>
+      <HBox alignment="BOTTOM_RIGHT" layoutX="542.0" layoutY="655.0" prefHeight="42.0" prefWidth="198.0" spacing="40.0">
+         <children>
+            <Button fx:id="SaveButton" mnemonicParsing="false" onAction="#OnActionSaveCustomer" prefHeight="17.0" prefWidth="72.0" text="Save" />
+            <Button fx:id="CancelButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#OnActionMainScreen" prefHeight="21.0" prefWidth="69.0" text="Cancel" />
+         </children>
+      </HBox>
+      <Label layoutX="51.0" layoutY="27.0" prefHeight="31.0" prefWidth="320.0" text="Add Customer ">
+         <font>
+            <Font size="38.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
