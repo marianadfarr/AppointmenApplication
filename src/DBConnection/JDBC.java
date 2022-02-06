@@ -1,4 +1,4 @@
-package helper;
+package DBConnection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,6 +32,7 @@ public abstract class JDBC {
         } catch (Exception e) {
             //System.out.println("Error:" + e.getMessage());
             // e.printStackTrace();
+            //do nothing, just close
         }
     }
 

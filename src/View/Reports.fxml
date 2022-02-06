@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="Reports" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="850.0" style="-fx-background-color: silver;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ReportsController">
+    <children>
+        <TabPane layoutX="26.0" layoutY="62.0" prefHeight="462.0" prefWidth="809.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab fx:id="ReportsByMonth" text="Customer Appointments # By Type and Month">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <TableView fx:id="ReportsByMonthTableView" layoutX="-1.0" layoutY="-2.0" prefHeight="491.0" prefWidth="809.0">
+                                    <columns>
+                                        <TableColumn fx:id="ReportsByMonthMonthColumn" prefWidth="90.0" text="Month" />
+                                        <TableColumn fx:id="ReportsByMonthNewAccountColumn" minWidth="-Infinity" prefWidth="90.0" text="Initial" />
+                                        <TableColumn fx:id="ReportsByMonthConsultationColumn" minWidth="-Infinity" prefWidth="123.0" text="Follow-Up" />
+                                        <TableColumn fx:id="ReportsByMonthFollowUpColumn" minWidth="-Infinity" prefWidth="126.0" text="Educational" />
+                                        <TableColumn fx:id="ReportsByMonthCloseAccountColumn" minWidth="-Infinity" prefWidth="132.0" text="Company Meetings" />
+                                        <TableColumn fx:id="ReportsByMonthCloseAccountColumn1" minWidth="-Infinity" prefWidth="131.0" text="Total / Month" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab fx:id="ReportsSchedule" text="Contact Schedule">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="432.0" prefWidth="769.0">
+                            <children>
+                                <TableView fx:id="ReportsScheduleTableView" layoutX="2.0" layoutY="-5.0" prefHeight="489.0" prefWidth="791.0">
+                                    <columns>
+                                        <TableColumn fx:id="ReportsScheduleCustomerColumn" prefWidth="108.0" text="Contact" />
+                                        <TableColumn fx:id="ReportsScheduleTitleColumn" prefWidth="103.5" text="Appointment ID" />
+                                        <TableColumn fx:id="ReportsScheduleTypeColumn" prefWidth="108.0" text="Title" />
+                                        <TableColumn fx:id="ReportsScheduleStartColumn" prefWidth="67.5" text="Type" />
+                                        <TableColumn fx:id="ReportsScheduleEndColumn" minWidth="9.0" prefWidth="91.0" text="Description" />
+                                        <TableColumn fx:id="ReportsScheduleEndColumn1" prefWidth="104.0" text="Start Date" />
+                                        <TableColumn fx:id="ReportsScheduleEndColumn11" prefWidth="112.0" text="End Date" />
+                                        <TableColumn fx:id="ReportsScheduleEndColumn111" prefWidth="112.0" text="Customer ID" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab fx:id="ReportsContactByMonth" text="Unscheduled time? Meetings">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <TableView fx:id="ReportsContactsByMonthTableView" prefHeight="434.0" prefWidth="466.0">
+                                    <columns>
+                                        <TableColumn fx:id="ReportsContactsMonthCol" prefWidth="116.79993057250977" text="x" />
+                                        <TableColumn fx:id="ReportsContactEmailCol" minWidth="-Infinity" prefWidth="115.0" text="x" />
+                                        <TableColumn fx:id="ReportsContactPhoneCol" minWidth="-Infinity" prefWidth="115.0" text="x" />
+                                        <TableColumn fx:id="ReportsContactInpersonCol" minWidth="-Infinity" prefWidth="115.0" text="x" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+        <Label layoutX="216.0" layoutY="14.0" prefHeight="37.0" prefWidth="569.0" text="AppointmentKeeper Reports">
+            <font>
+                <Font name="System Bold Italic" size="29.0" />
+            </font>
+        </Label>
+        <Button fx:id="ReportsMainMenuButton" layoutX="355.0" layoutY="562.0" mnemonicParsing="false" onAction="#OnActionMainMenu" text="Main Menu" />
+    </children>
+</AnchorPane>
