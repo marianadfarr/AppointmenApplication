@@ -17,15 +17,15 @@ public class DBUser {
     //delete
 
     //get all user IDs
-    public static ObservableList<String> getAllUserIDs() throws SQLException {
-        ObservableList<String> AllUserIDs = FXCollections.observableArrayList();
+    public static ObservableList<Integer> getAllUserIDs() throws SQLException {
+        ObservableList<Integer> AllUserIDs = FXCollections.observableArrayList();
 
         String sql = "SELECT User_ID FROM Users";
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ResultSet UserResults = ps.executeQuery();
 
         while (UserResults.next()) {
-            AllUserIDs.add(UserResults.getString("User_ID"));
+            AllUserIDs.add(UserResults.getInt("User_ID"));
         }
         return AllUserIDs;
 

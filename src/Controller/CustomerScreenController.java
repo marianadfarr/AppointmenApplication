@@ -2,7 +2,9 @@ package Controller;
 
 import DAOAcess.DBAppointment;
 import DAOAcess.DBCustomer;
+import Model.Appointment;
 import Model.Customer;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +18,8 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -93,24 +97,39 @@ public class CustomerScreenController implements Initializable {
     @FXML
     void OnActionDeleteCustomer(ActionEvent event) throws IOException, SQLException {
         CustomerToDelete = CustomerTableView.getSelectionModel().getSelectedItem().getCustomerID();
+        if (FindCustomerAppointments(CustomerToDelete)) { //if there are ANY appointments in the Customer Appointments list, return error
+            Alert alert = new Alert(Alert.AlertType.ERROR, " You cannot delete a customer with associated appointments."); //alert is an overloaded method
+            Optional<ButtonType> result = alert.showAndWait();
+        }
+
+        else  {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, " This will delete the customer. Proceed?" ); //alert is an overloaded method
+            Optional<ButtonType> result = alert.showAndWait();
+              DBCustomer.DeleteCustomer(CustomerToDelete);
+                //it will return a boolean if there's a button inside optional container and if it is the ok button
+                stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+                scene = FXMLLoader.load(getClass().getResource("/View/CustomerScreen.fxml"));
+                stage.setScene(new Scene(scene));
+                stage.show();
+
+            }
+        }
 
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "This will delete the customer. Are you sure you want to proceed?"); //alert is an overloaded method
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            DBCustomer.DeleteCustomer(CustomerToDelete);
-            //it will return a boolean if there's a button inside optional container and if it is the ok button
-            stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-            scene = FXMLLoader.load(getClass().getResource("/View/CustomerScreen.fxml"));
-            stage.setScene(new Scene(scene));
-            stage.show();
-
-        }}
-
-
+    public Boolean FindCustomerAppointments(Integer CustomerID) throws SQLException {
+        ObservableList<Appointment> CustomerAppointments = DBCustomer.getAllAppointmentsForCustomer(CustomerID);
+        // for each possible appointment for that custumer on the same date, evaluate:
+        // if conflictApptStart is before the new appointment we want to make  AND conflictApptEnd is after newApptStart(starts before ends after)
+        // if conflictApptStart is before newApptEnd (if appointment starts before another ends) AND conflictApptStart after newApptStart (startime anywhere in appt)
+        // if endtime is before end and endtime is after start (endtime falls anywhere in appt)
+        if (CustomerAppointments.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
 
 
-
+    }
     @FXML
     void OnActionMainMenu(ActionEvent event) throws IOException {
 

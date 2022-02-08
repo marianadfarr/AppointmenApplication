@@ -2,6 +2,7 @@ package DAOAcess;
 
 import DBConnection.JDBC;
 import Model.Appointment;
+import Model.Session;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -15,6 +16,9 @@ import java.time.format.DateTimeFormatter;
 import static javafx.collections.FXCollections.observableArrayList;
 
 public class DBAppointment {
+
+    public DBAppointment() throws SQLException {
+    }
 
     public static ObservableList<Appointment> GetAllAppointments() throws SQLException {
         ObservableList<Appointment> AllAppointmentsList = observableArrayList(); // create list to add each object to
@@ -59,25 +63,22 @@ public class DBAppointment {
         return AllAppointmentsList;
     }
 
-    //injects data to sql. has more columns than what we can see in main screen
-    public static Boolean CreateAppointment(String title, String description, String location, String type, ZonedDateTime startdatetime, ZonedDateTime enddatetime, String createdBy, String Updatedby, int customerID, int userID, int contactID) throws SQLException {
-        //fixme
+    //injects data to sql. This has more columns than what we can see in main screen/appointment view.
+    public static Boolean CreateAppointment(String title, String description, String location, String type, Timestamp StartDateTime,Timestamp EndDateTime, String createdBy, String Updatedby, int customerID, int userID, int contactID) throws SQLException {
 
-
-        String sqlsca = "INSERT into Appointment VALUES(NULL, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?)"; //usingcomboboxes
-        PreparedStatement psti = JDBC.getConnection().prepareStatement(sqlsca); //db connection,prepared statement,
-        //skip ID?
-        //here we set our values onto question marks
-        // Format inputStart and inputEnd
+        String sqlsca = "INSERT into Appointments VALUES(NULL, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?)"; //using comboboxes
+        PreparedStatement psti = JDBC.getConnection().prepareStatement(sqlsca, Statement.RETURN_GENERATED_KEYS); //db connection,prepared statement,
+        //format start and end times
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String inputStartString = startdatetime.format(formatter); //string version of startinput
-        String inputEndString = enddatetime.format(formatter); //string version of end input
+//        //formatting our dates accordingly
+//        String Start = StartDateTime.format(String.valueOf(formatter));
+//        String End= EndDateTime.format(String.valueOf(formatter)); //string version of end date time.
         psti.setString(1, title);
         psti.setString(2, description);
         psti.setString(3, location);
         psti.setString(4, type);
-        psti.setString(5, inputStartString); //start time in UTC?
-        psti.setString(6, inputEndString); //end time in UTC?
+        psti.setTimestamp(5, StartDateTime); //setting timestamps
+        psti.setTimestamp(6, EndDateTime);
         psti.setString(7, ZonedDateTime.now(ZoneOffset.UTC).format(formatter)); //createdtime- make NOW into UTC, not an inpput
         psti.setString(8, createdBy);
         psti.setString(9, ZonedDateTime.now(ZoneOffset.UTC).format(formatter)); //Lastupdated- make NOW into UTC, not an input
@@ -88,9 +89,9 @@ public class DBAppointment {
 
         try {
             psti.execute();
-            ResultSet resultset = psti.getGeneratedKeys();
+            ResultSet resultset = psti.getGeneratedKeys(); //for ID
             resultset.next();
-            int appointmentID = resultset.getInt(1); //pull from column 1 of tis one result
+//
             return true;
         } catch (SQLException throwables) {
             throwables.printStackTrace(); //print errors if any.
@@ -99,15 +100,15 @@ public class DBAppointment {
 
     }
 
-//finds all appointments for a specifc customer on a specific day. used to find any appt conflicts
+    //finds all appointments for a spefici customer on a specific day. used to find any appt conflicts
     //this is to find out any overlaps in appointments
     public static ObservableList<Appointment> getCustomerFilteredAppointments(
             LocalDate Date, Integer CustomerID) throws SQLException {
-        // Prepare SQL statement
-        //select all appointments from contacts where the date
-        ObservableList<Appointment> filteredAppts = FXCollections.observableArrayList();
+
+        //select all appointments from testcustomers where the date is the same as the date chosen in date picker.
+        ObservableList<Appointment> filteredAppointments = FXCollections.observableArrayList();
         String sql = "SELECT * FROM Appointments JOIN contacts ON Appointments.Contact_ID = " +
-                "Contacts.Contact_ID WHERE DATEDIFF(Appointments.Start, ?) = 0 AND Customer_ID = ?";
+                "Contacts.Contact_ID WHERE DATEDIFF(Appointments.Start, ?) = 0 AND Customer_ID = ?;";
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
 
 
@@ -123,7 +124,7 @@ public class DBAppointment {
             String description = results.getString("Description");
             String location = results.getString("Location");
             String type = results.getString("Type");
-            Timestamp startDateTime = results.getTimestamp("Start");
+            Timestamp startDateTime = results.getTimestamp("Start"); //automatically gets it in local time
             Timestamp endDateTime = results.getTimestamp("End");
             Timestamp createdDate = results.getTimestamp("Create_Date");
             String createdBy = results.getString("Created_by");
@@ -139,20 +140,60 @@ public class DBAppointment {
                     appointmentID, title, description, location, type, startDateTime, endDateTime, createdDate,
                     createdBy, lastUpdateDateTime, lastUpdatedBy, customerID, userID, contactID, contactName
             );
-            filteredAppts.add(newAppt);
+            filteredAppointments.add(newAppt);
         }
 
-        return filteredAppts;
+        return filteredAppointments;
 
     }
 
+
+    public static Boolean DeleteAppointment(Integer AppointmentID) throws SQLException {
+        String sql = "DELETE FROM Appointments WHERE Appointment_ID = ?";
+        PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+        ps.setInt(1, AppointmentID); //this is for the questionmark
+
+        try {
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public static Boolean updateAppointment(int ApptID, String title, String description, String location, String type, Timestamp startdatetime, Timestamp enddatetime,  String Updatedby, int customerID, int userID, int contactID) throws SQLException {
+        String sqlCommand = "UPDATE appointments SET Title=?, Description=?, Location=?, Type=?, Start=?, End=?, Last_Update=?,Last_Updated_By=?, " +
+                "Customer_ID=?, User_ID=?, Contact_ID=? WHERE Appointment_ID = ?";
+        PreparedStatement ps = JDBC.getConnection().prepareStatement(sqlCommand);
+        //fixme doesnt the start and end  have to be in hh:mm:ss
+       DateTimeFormatter dateformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String StartString = startdatetime.format(dateformatter); //string version of start date time
+//        String EndString = enddatetime.format(dateformatter); //string version of end date time.
+        ps.setString(1, title);
+        ps.setString(2, description);
+        ps.setString(3, location);
+        ps.setString(4, type);
+        ps.setTimestamp(5, startdatetime); //sets start time in string form but will be utc in DB
+        ps.setTimestamp(6, enddatetime);
+        ps.setString(7, ZonedDateTime.now(ZoneOffset.UTC).format(dateformatter)); //createdtime- make NOW into UTC, not an inpput
+        ps.setString(8, Updatedby);
+        ps.setInt(9, customerID);
+        ps.setInt(10, userID);
+        ps.setInt(11, contactID);
+        ps.setInt(12, ApptID);
+        try {
+            ps.executeUpdate();
+            ps.close();
+            return true;
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+            ps.close();
+            return false;
+        }
+
+    }
 }
 
-/**
-
-
-
-    //Update
-    //delete
-
-     */

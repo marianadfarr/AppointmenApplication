@@ -1,7 +1,10 @@
 package Controller;
 
 import DAOAcess.DBAppointment;
+import DAOAcess.DBCustomer;
+import DBConnection.JDBC;
 import Model.Appointment;
+import Model.Customer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -10,15 +13,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class MainScreenController implements Initializable {
@@ -57,12 +60,32 @@ public class MainScreenController implements Initializable {
     private TableColumn<Appointment, Integer> userIDcol;
 
 
-
-
     ObservableList<Appointment> AppointmentObservableList = FXCollections.observableArrayList();
 
     Stage stage;
     Parent scene;
+
+    private static int AppointmentSelected; //AppointmentID to delete
+
+    public static int getSelectedAppointment() {
+        return AppointmentSelected;
+    }
+
+    private static String AppointmentType;
+
+    public static String getAppointmentType() {
+        return AppointmentType;
+    }
+    private static Appointment AppointmentToEdit;
+    public static Appointment getAppointmentToEdit() {
+        return AppointmentToEdit;
+    }
+
+
+
+
+
+
 
     @FXML
     void OnActionCreateAppointment(ActionEvent event) throws IOException { //exception just in case this FXML file doesn't exist , input output error
@@ -96,6 +119,42 @@ public class MainScreenController implements Initializable {
     void WeekViewAppointments(ActionEvent event) {
         System.out.println("Placeholder");
 
+    }
+    @FXML
+    void OnActionDeleteAppointment(ActionEvent event) throws IOException, SQLException {
+        AppointmentSelected = AppointmentTableView.getSelectionModel().getSelectedItem().getAppointmentID();
+        AppointmentType= AppointmentTableView.getSelectionModel().getSelectedItem().getType();
+//appoitnment to delete ID
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "This will delete the appointment. Are you sure you want to proceed?"); //alert is an overloaded method
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            DBAppointment.DeleteAppointment(AppointmentSelected);
+
+        }
+
+        //it will return a boolean if there's a button inside optional container and if it is the ok button
+        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+        scene = FXMLLoader.load(getClass().getResource("/View/MainScreen.fxml"));
+        stage.setScene(new Scene(scene));
+        stage.show();
+
+        Alert alert1 = new Alert(Alert.AlertType.INFORMATION, "You have successfully deleted the appointment with ID  " + AppointmentSelected +  "  and Type  " + AppointmentType ); //alert is an overloaded method
+        Optional<ButtonType> result1 = alert1.showAndWait();
+    }
+
+    @FXML
+    void OnActionUpdateAppointment(ActionEvent event) throws IOException {
+        AppointmentToEdit = AppointmentTableView.getSelectionModel().getSelectedItem();
+        if (AppointmentToEdit == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "No appointment selected."); //alert is an overloaded method
+            Optional<ButtonType> result = alert.showAndWait();
+        } else {
+            stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+            scene = FXMLLoader.load(getClass().getResource("/View/ModifyAppointmentScreen.fxml"));
+            stage.setScene(new Scene(scene));
+            stage.show();
+
+        }
     }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

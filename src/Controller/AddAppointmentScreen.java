@@ -68,10 +68,10 @@ public class AddAppointmentScreen implements Initializable {
     private ComboBox<String> ContactComboBox;
 
     @FXML
-    private ComboBox<String> CustomerIDComboBox;
+    private ComboBox<Integer> CustomerIDComboBox;
 
     @FXML
-    private ComboBox<String> UserIDComboBox;
+    private ComboBox<Integer> UserIDComboBox;
 
 
     Random rand = new Random();
@@ -86,85 +86,92 @@ public class AddAppointmentScreen implements Initializable {
         Boolean validEnd = true;
         Boolean AppointmentOverlap = true;
         Boolean BusinessHours = true;
-        String errorMessage = "";
+        Boolean AppointmentHours = true;
 
-        int AppointmentID = rand.nextInt(5, 500); //assigned a random number between 5 and 400.
         String title = Title.getText();
         String description = Description.getText();
         String location = Location.getText();
-        String contactName= ContactComboBox.getValue(); //you need to put contact object no?
+        String contactName = ContactComboBox.getValue();
         String type = Type.getText();
-        Integer CustomerID = Integer.valueOf(CustomerIDComboBox.getSelectionModel().getSelectedItem());
-        Integer userID = Integer.valueOf(UserIDComboBox.getSelectionModel().getSelectedItem());
+        Integer CustomerID = CustomerIDComboBox.getValue();
+        Integer userID = UserIDComboBox.getValue();
         LocalDate Date = DatePicker.getValue();
         LocalDateTime endDateTime = null;
-        LocalDateTime startDateTime = null;
-        ZonedDateTime zonedEndDateTime = null;
-        ZonedDateTime zonedStartDateTime = null;
+        LocalDateTime startDateTime = null; // will set this up with a datepicker and time text
 
         // take Contact name from combo box. and find the contact_ID so this can be added in SQL DB
         Integer contactID = DBContact.findContactID(contactName);
 
-        DateTimeFormatter ApptDTFormatter = DateTimeFormatter.ofPattern("HH:mm:ss"); //formatter for DateTime - hour, min & seconds
+       ; //formatter for DateTime - hour, min & seconds
+
+        DateTimeFormatter DTF= DateTimeFormatter.ofPattern("HH:mm"); //for the TIME only.
 
         try {  //Takes a date and time creates a local datetime
             startDateTime = LocalDateTime.of(DatePicker.getValue(),
-                    LocalTime.parse(startTime.getText(), ApptDTFormatter)); //this is a localdatetime
-            validStart = true;
+                    LocalTime.parse(startTime.getText(),DTF)); //this is a localdatetime
+            validStart = true;  //fixme validstart is never used?
         } catch (DateTimeParseException error) {
             validStart = false;
-            errorMessage += "Invalid Start time. Please use the format HH:MM:SS.";
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid Start time. Please use the format HH:MM");
+            alert.showAndWait();
+
         }
 //takes a date and time, creates a localdatetime
         try {
             endDateTime = LocalDateTime.of(DatePicker.getValue(), //this is a local date time
-                    LocalTime.parse(endTime.getText(), ApptDTFormatter));
+                    LocalTime.parse(endTime.getText(),DTF));
             validEnd = true;
         } catch (DateTimeParseException error) {
             validEnd = false;
-            errorMessage += "Invalid End time. Please ensure proper format HH:MM:SS";
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid End time. Please use the format HH:MM");
+            alert.showAndWait();
         }
-
-
-        // INPUT VALIDATION: check that business hours are valid and there is no double booked customers.
-        BusinessHours = ValidateBusinessHours(startDateTime, endDateTime, Date);
-        AppointmentOverlap = FindAppointmentOverlap(CustomerID, startDateTime, endDateTime, Date);
-
-        // INPUT VALIDATION: set corresponding error for user
-        if (!BusinessHours) {
-            errorMessage += "Invalid Business Hours - Appointment must be between 8am to 10pm EST";
-        }
-        if (AppointmentOverlap) {
-            errorMessage += "There is a customer overlap. Try again. ";
-        }
-
         // INPUT VALIDATION: Ensure all fields have been entered
-        if (title.isBlank() || description.isBlank() || location.isBlank() || contactName == null || type.isBlank() ||
-                CustomerID == null || userID == null || Date == null || endDateTime == null ||
-                startDateTime == null) {
-
-            errorMessage += "Please ensure a value has been entered in all fields.";
-
-
-        }
-
-        // INPUT VALIDATION - if any requirements are false, show error and end method.
-        if (AppointmentOverlap || !BusinessHours || !validStart || !validEnd) {
+        if (title.isBlank() || description.isBlank() || location.isBlank() || type.isBlank() || contactName == null || userID == null || Date == null || endDateTime == null || startDateTime == null) {
             ButtonType clickOkay = new ButtonType("Okay", ButtonBar.ButtonData.OK_DONE);
-            Alert invalidInput = new Alert(Alert.AlertType.WARNING, errorMessage, clickOkay); //puts all error messages
+            Alert invalidInput = new Alert(Alert.AlertType.ERROR, "Please ensure a value has been entered in all fields.", clickOkay);
             invalidInput.showAndWait();
             return;
+        }
+
+
+        // INPUT VALIDATION: check that business hours are valid and there is no double booked customers and that the start is before the end and end after start..
+        BusinessHours = ValidateBusinessHours(startDateTime, endDateTime, Date); //fixme would we need to change this because startdate and end date are now dattime
+        AppointmentOverlap = FindAppointmentOverlap(CustomerID, startDateTime, endDateTime, Date);
+        AppointmentHours = ValidateAppointmentHours(startDateTime, endDateTime);
+        // INPUT VALIDATION: set corresponding error for user
+        if (!BusinessHours) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid Business Hours - Appointment must be between 8am to 10pm EST");
+            alert.showAndWait();
+
 
         }
+        if (AppointmentOverlap) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "There is a customer overlap. Try again. ");
+            alert.showAndWait();
+
+
+        }
+        if (!AppointmentHours) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Make sure the start time is before the end time, and the end time is after start time.");
+            alert.showAndWait();
+        }
+
+
         else {
             // if input is valid we insert into DB and display success and clear.
             // prep start and endTime by turning them into a zonedDateTime so we can enter in the DB in UTC.
-            zonedStartDateTime = ZonedDateTime.of(startDateTime, Session.getUserTimeZone()); //should we use timestamp?
-            zonedEndDateTime = ZonedDateTime.of(endDateTime, Session.getUserTimeZone());
+            Timestamp StartTimeStamp= Timestamp.valueOf(startDateTime);
+            Timestamp EndDateTimeStamp= Timestamp.valueOf(endDateTime);
             String loggedOnUser = Session.getLoggedOnUser().getUserName(); //get the name of current user to put into created by and updatedby fields
-        // Add appt to DB - title, description, including last updatedby and created by (logged on user)
-        Boolean AppointmentAdded = DBAppointment.CreateAppointment(title, description, location, type, zonedStartDateTime,
-                zonedEndDateTime,loggedOnUser, loggedOnUser, CustomerID, userID, contactID);
+
+//           //convert zaonedStartDateTime and zonedEndDateTime to UTC before adding to DB!!!
+//            zonedStartDateTime = zonedStartDateTime.withZoneSameInstant(ZoneOffset.UTC);
+//            zonedEndDateTime = zonedEndDateTime.withZoneSameInstant(ZoneOffset.UTC);
+
+            // Add appt to DB - title, description, including last updatedby and created by (both logged on user)
+        Boolean AppointmentAdded = DBAppointment.CreateAppointment(title, description, location, type, StartTimeStamp,
+                EndDateTimeStamp,loggedOnUser, loggedOnUser, CustomerID, userID, contactID);
             // notify user we successfully added to DB, or if there was an error.
         if (AppointmentAdded) {
   //switch to appointment view
@@ -174,7 +181,8 @@ public class AddAppointmentScreen implements Initializable {
             stage.show();
         }
         else {
-            System.out.println("error msg");
+            Alert alert = new Alert(Alert.AlertType.ERROR,    "Appointment not added. Try again. ");
+            alert.showAndWait();
         }
 
     }
@@ -192,7 +200,7 @@ public Boolean ValidateBusinessHours(LocalDateTime startDateTime, LocalDateTime 
         ZonedDateTime startZonedDateTime = ZonedDateTime.of(startDateTime, Session.getUserTimeZone());
         ZonedDateTime endZonedDateTime = ZonedDateTime.of(endDateTime, Session.getUserTimeZone());
 
-        ZonedDateTime startBusinessHours = ZonedDateTime.of(Date, LocalTime.of(8, 0),
+        ZonedDateTime startOfBusinessHours = ZonedDateTime.of(Date, LocalTime.of(8, 0),
                 ZoneId.of("America/New_York"));
         ZonedDateTime endBusinessHours = ZonedDateTime.of(Date, LocalTime.of(22, 0),
                 ZoneId.of("America/New_York"));
@@ -200,17 +208,21 @@ public Boolean ValidateBusinessHours(LocalDateTime startDateTime, LocalDateTime 
         // If startTime is before or after business hours
         // If end time is before or after business hours
         // if startTime is after endTime - these should cover all possible times entered and validate input.
-        if (startZonedDateTime.isBefore(startBusinessHours) || startZonedDateTime.isAfter(endBusinessHours) ||
-                endZonedDateTime.isBefore(startBusinessHours) || endZonedDateTime.isAfter(endBusinessHours) ||
-                startZonedDateTime.isAfter(endZonedDateTime)) {
+        if (startZonedDateTime.isBefore(startOfBusinessHours) || startZonedDateTime.isAfter(endBusinessHours) ||
+                endZonedDateTime.isAfter(endBusinessHours) || startZonedDateTime.isAfter(endZonedDateTime) || endZonedDateTime.isBefore(startOfBusinessHours)) {
+            return false; }
+    else
+        {
+            return true;
+        }
+}
+    public Boolean ValidateAppointmentHours(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        if (startDateTime.isAfter(endDateTime) || (endDateTime.isBefore(startDateTime))) {
             return false;
-
         } else {
             return true;
         }
-
     }
-
     // Get list of customer appointments that might have conflicts because they are on the same date.
     public Boolean FindAppointmentOverlap(Integer inputCustomerID, LocalDateTime startDateTime,
                                           LocalDateTime endDateTime, LocalDate Date) throws SQLException {
@@ -228,19 +240,19 @@ public Boolean ValidateBusinessHours(LocalDateTime startDateTime, LocalDateTime 
             //for every appointment object in the possible appointment conflicts list
             for (Appointment appointment : AppointmentConflicts) {
              //get the start time and end time to those conlifct appointments
-                LocalDateTime conflictStart = appointment.getStartDatetime().toLocalDateTime();
-                LocalDateTime conflictEnd = appointment.getEndDatetime().toLocalDateTime();
+                LocalDateTime ApptConflictStart = appointment.getStartDatetime().toLocalDateTime();
+                LocalDateTime ApptConflictEnd = appointment.getEndDatetime().toLocalDateTime();
 
                 // Conflict starts before and Conflict ends any time after new appt ends - overlap
-                if (conflictStart.isBefore(startDateTime) & conflictEnd.isAfter(endDateTime)) {
+                if (ApptConflictStart.isBefore(startDateTime) & ApptConflictEnd.isAfter(endDateTime)) {
                     return true;
                 }
                 // ConflictAppt start time falls anywhere in the new appt
-                if (conflictStart.isBefore(endDateTime) & conflictStart.isAfter(startDateTime)) {
+                if (ApptConflictStart.isBefore(endDateTime) & ApptConflictStart.isAfter(startDateTime)) {
                     return true;
                 }
                 // ConflictAppt end time falls anywhere in the new appt
-                if (conflictEnd.isBefore(endDateTime) & conflictEnd.isAfter(startDateTime)) {
+                if (ApptConflictEnd.isBefore(endDateTime) & ApptConflictEnd.isAfter(startDateTime)) {
                     return true;
                 } else {
                     return false;
@@ -261,14 +273,22 @@ public Boolean ValidateBusinessHours(LocalDateTime startDateTime, LocalDateTime 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
         try { //set all ContactID, Customer ID, and User ID data in combo boxes.
-            ContactComboBox.setItems(DBContact.getAllContactNames()); //we actually need contact name
-            CustomerIDComboBox.setItems(DBCustomer.getAllCustomerIDs()); //this is fine
+            ContactComboBox.setItems(DBContact.getAllContactNames());
+            CustomerIDComboBox.setItems(DBCustomer.getAllCustomerIDs());
             UserIDComboBox.setItems(DBUser.getAllUserIDs());
-//            DatePicker.setDisable();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        DatePicker.setDayCellFactory(picker -> new DateCell() {
+            //disable appt picker for before today's date, saturday & sunday
+            public void updateItem(LocalDate Date, boolean empty) {
+                super.updateItem(Date, empty);
+                LocalDate today = LocalDate.now();
+                setDisable(empty || Date.compareTo(today) < 0 ||Date.getDayOfWeek() == DayOfWeek.SATURDAY || Date.getDayOfWeek() == DayOfWeek.SUNDAY);
+
+
+
     }
-}
+});}}

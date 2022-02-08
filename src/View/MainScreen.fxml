@@ -32,9 +32,8 @@
       <HBox alignment="CENTER" layoutX="138.0" layoutY="582.0" prefHeight="124.0" prefWidth="626.0" spacing="25.0">
          <children>
             <Button mnemonicParsing="false" onAction="#OnActionCreateAppointment" prefHeight="38.0" prefWidth="202.0" text="Create New Appointment" />
-            <Button mnemonicParsing="false" prefHeight="46.0" prefWidth="153.0" text="Update Appointment" />
-            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="132.0" text="Go to Appointment" />
-            <Button layoutX="214.0" layoutY="52.0" mnemonicParsing="false" text="Delete Appointment" />
+            <Button mnemonicParsing="false" onAction="#OnActionUpdateAppointment" prefHeight="46.0" prefWidth="153.0" text="Update Appointment" />
+            <Button layoutX="214.0" layoutY="52.0" mnemonicParsing="false" onAction="#OnActionDeleteAppointment" text="Delete Appointment" />
          </children>
       </HBox>
       <TabPane layoutX="6.0" layoutY="75.0" prefHeight="43.0" prefWidth="535.0" tabClosingPolicy="UNAVAILABLE">

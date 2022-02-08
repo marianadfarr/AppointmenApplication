@@ -1,9 +1,8 @@
 package DAOAcess;
 
 import DBConnection.JDBC;
-import Model.Countries;
+import Model.Appointment;
 import Model.Customer;
-import Model.FirstLevelDivisions;
 import Model.Session;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -156,16 +155,16 @@ public class DBCustomer {
 
 
     //get all customer iDs
-    public static ObservableList<String> getAllCustomerIDs() throws SQLException {
+    public static ObservableList<Integer> getAllCustomerIDs() throws SQLException {
 
-        ObservableList<String> allCustomerIDs = FXCollections.observableArrayList();
+        ObservableList<Integer> allCustomerIDs = FXCollections.observableArrayList();
 
         String sql = "SELECT Customer_ID FROM Customers";
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ResultSet CustomerResults = ps.executeQuery();
 
         while (CustomerResults.next()) {
-            allCustomerIDs.add(CustomerResults.getString("Customer_ID"));
+            allCustomerIDs.add(CustomerResults.getInt("Customer_ID"));
         }
         return allCustomerIDs;
 
@@ -185,12 +184,49 @@ public class DBCustomer {
         return AllCountries;
 
     }
+    public static ObservableList<Appointment> getAllAppointmentsForCustomer(Integer CustomerID) throws SQLException {
+        //get an observable list of all customer appointments for one customer, if any.
+        ObservableList<Appointment> CustomerApppointments = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM Appointments JOIN contacts ON Appointments.Contact_ID = " +
+                "Contacts.Contact_ID WHERE Customer_ID = ?";
+        PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+
+        ps.setInt(1, CustomerID); //first question mark
+
+        ResultSet results = ps.executeQuery();
+
+        while (results.next()) {
+            // get data from the returned rows
+            Integer appointmentID = results.getInt("Appointment_ID");
+            String title = results.getString("Title");
+            String description = results.getString("Description");
+            String location = results.getString("Location");
+            String type = results.getString("Type");
+            Timestamp startDateTime = results.getTimestamp("Start");
+            Timestamp endDateTime = results.getTimestamp("End");
+            Timestamp createdDate = results.getTimestamp("Create_Date");
+            String createdBy = results.getString("Created_by");
+            Timestamp lastUpdateDateTime = results.getTimestamp("Last_Update");
+            String lastUpdatedBy = results.getString("Last_Updated_By");
+            Integer customerID = results.getInt("Customer_ID");
+            Integer userID = results.getInt("User_ID");
+            Integer contactID = results.getInt("Contact_ID");
+            String contactName = results.getString("Contact_Name");
+
+            // populate into an appt object
+            Appointment newAppt = new Appointment(
+                    appointmentID, title, description, location, type, startDateTime, endDateTime, createdDate,
+                    createdBy, lastUpdateDateTime, lastUpdatedBy, customerID, userID, contactID, contactName
+            );
+            CustomerApppointments.add(newAppt);
+        }
+        return CustomerApppointments;
+    }
 
     public static Boolean DeleteCustomer(Integer customerID) throws SQLException {
         String sql = "DELETE FROM Customers WHERE Customer_ID = ?";
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
         ps.setInt(1, customerID); //this is for the questionmark
-
         try {
             ps.executeUpdate();
             return true;

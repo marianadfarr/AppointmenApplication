@@ -35,7 +35,7 @@
             <Label prefHeight="17.0" prefWidth="83.0" text="Phone Number" GridPane.rowIndex="4" />
             <Label fx:id="CompOrMachineID" alignment="CENTER" prefHeight="24.0" prefWidth="109.0" GridPane.rowIndex="5" />
             <TextField fx:id="AddName" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="ModifyID" disable="true" editable="false" GridPane.columnIndex="1" />
+            <TextField fx:id="ModifyID" disable="true" editable="false" promptText="Auto-Generated" GridPane.columnIndex="1" />
             <TextField fx:id="AddAddress" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <TextField fx:id="AddPostal" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <TextField fx:id="AddPhone" GridPane.columnIndex="1" GridPane.rowIndex="4" />
