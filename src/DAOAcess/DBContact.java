@@ -7,49 +7,43 @@ import javafx.collections.ObservableList;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+/**
+ *This gets data for the Contacts on the database.
+ * We do not need to create, update, or delete any countries.
+ */
 public class DBContact {
-//CRUD
-    //do not create any
-
-    public static ObservableList<String> getAllContactIDs() throws SQLException {
-
-        ObservableList<String> allContactIDs = FXCollections.observableArrayList();
-
-        String sql = "SELECT Contact_ID FROM Contacts";
-        PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
-        ResultSet contactIDResults = ps.executeQuery();
-
-        while (contactIDResults.next()) {
-            allContactIDs.add(contactIDResults.getString("Contact_ID"));
-        }
-        return allContactIDs;
 
 
-    }
-
+    /**This gets data for the Contacts on the database.
+     * @return allContactNames observable list of contact names
+     * @throws SQLException if DB could not connect
+     */
     public static ObservableList<String> getAllContactNames() throws SQLException {
 
         ObservableList<String> allContactNames = FXCollections.observableArrayList();
 
         String sql = "SELECT Contact_Name FROM Contacts";
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
-        ResultSet Countryresults = ps.executeQuery();
+        ResultSet contactNames = ps.executeQuery();
 
-        while (Countryresults.next()) {
-            allContactNames.add(Countryresults.getString("Contact_Name"));
+        while (contactNames.next()) {
+            allContactNames.add(contactNames.getString("Contact_Name"));
         }
         return allContactNames;
     }
 
+
+    /**Given a contact name, find its corresponding ID
+     * @param contactName Contact Name
+     * @return ContactID Corresponding contact ID
+     * @throws SQLException if no such Contact name exists in database.
+     */
     public static Integer findContactID(String contactName) throws SQLException {
         int ContactID = 0;
         String sql = "SELECT Contact_ID FROM Contacts WHERE Contact_Name = ?";
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
-        ps.setString(1, contactName); //this is for the questionmark
+        ps.setString(1, contactName);
         ResultSet contactResult = ps.executeQuery();
-        //double check if this works fixme because i coded it
-
 
         while (contactResult.next()) {
             ContactID = contactResult.getInt("Contact_ID");

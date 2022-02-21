@@ -21,66 +21,109 @@ public class Countries {
     }
 
 
-    public Countries( int countryID, String countryName){
-            this.countryID = countryID;
-            this.countryName = countryName;
-        }
-
+    /**
+     *
+     * @param countryName for country
+     */
     public Countries(String countryName) {
         this.countryName= countryName;
     }
 
+
+    /**
+     *
+     * @return countryID for country
+     */
     public int getCountryID () {
             return countryID;
         }
 
+    /**
+     *
+     * @param countryID for country
+     */
         public void setCountryID ( int countryID){
             this.countryID = countryID;
         }
 
+    /**
+     *
+     * @return Name for country
+     */
         public String getCountryName () {
             return countryName;
         }
 
+    /**
+     *
+     * @param countryName for country
+     */
         public void setCountryName (String countryName){
             this.countryName = countryName;
         }
 
+    /**
+     *
+     * @return createdDate for country
+     */
         public Date getCreatedDate () {
             return createdDate;
         }
 
+    /**
+     *
+     * @param createdDate for country
+     */
         public void setCreatedDate (Date createdDate){
             this.createdDate = createdDate;
         }
 
+    /**
+     *
+     * @return CreatedBy for country
+     */
         public String getCreatedBy () {
             return createdBy;
         }
 
+    /**
+     *
+     * @param createdBy for country
+     */
         public void setCreatedBy (String createdBy){
             this.createdBy = createdBy;
         }
 
+    /**
+     *
+     * @return LastUpdate for country
+     */
         public Timestamp getLastUpdate () {
             return lastUpdate;
         }
 
+    /**
+     *
+     * @param lastUpdate for country
+     */
         public void setLastUpdate (Timestamp lastUpdate){
             this.lastUpdate = lastUpdate;
         }
 
+    /**
+     *
+     * @return last updated by for country
+     */
         public String getLastUpdatedBy () {
             return lastUpdatedBy;
         }
 
+    /**
+     *
+     * @param lastUpdatedBy for country
+     */
         public void setLastUpdatedBy (String lastUpdatedBy){
             this.lastUpdatedBy = lastUpdatedBy;
         }
-        //Country_ID int AI PK
-        //Country varchar(50)
-        //Create_Date datetime
-        //Created_By varchar(50)
-        //Last_Update timestamp
-        //Last_Updated_By varchar(50)
+
     }

@@ -51,8 +51,7 @@
             <Font size="38.0" />
          </font>
       </Label>
-      <Button layoutX="39.0" layoutY="630.0" mnemonicParsing="false" onAction="#OnActionClearAll" text="Clear All Fields" />
       <Button fx:id="SaveButton" layoutX="176.0" layoutY="632.0" mnemonicParsing="false" onAction="#OnActionSave" prefHeight="17.0" prefWidth="72.0" text="Save" />
-      <Button fx:id="CancelButton" layoutX="261.0" layoutY="633.0" mnemonicParsing="false" onAction="#OnActionBack" prefHeight="21.0" prefWidth="69.0" text="Cancel" />
+      <Button fx:id="CancelButton" layoutX="261.0" layoutY="633.0" mnemonicParsing="false" onAction="#OnActionBack" prefHeight="25.0" prefWidth="72.0" text="Cancel" />
    </children>
 </AnchorPane>

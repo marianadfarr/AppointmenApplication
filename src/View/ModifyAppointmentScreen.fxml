@@ -47,7 +47,6 @@
             <Label prefHeight="20.0" prefWidth="295.0" text="Start Time (HH:mm:ss)" GridPane.rowIndex="7" />
             <Label text="Custumer ID" GridPane.rowIndex="9" />
             <Label text="User ID" GridPane.rowIndex="10" />
-            <TextField fx:id="Type" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <TextField fx:id="startTime" GridPane.columnIndex="1" GridPane.rowIndex="7" />
             <TextField fx:id="customerID" GridPane.columnIndex="1" GridPane.rowIndex="9" />
             <TextField fx:id="UserID" prefHeight="18.0" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="10" />
@@ -58,6 +57,7 @@
             <Label prefHeight="23.0" prefWidth="300.0" text="End Time (HH:mm:ss)" GridPane.rowIndex="8" />
             <DatePicker fx:id="DatePicker" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <Label text="Date" GridPane.rowIndex="6" />
+            <TextField fx:id="Type" GridPane.columnIndex="1" GridPane.rowIndex="5" />
          </children>
       </GridPane>
       <HBox layoutX="451.0" layoutY="631.0" prefHeight="86.0" prefWidth="309.0" spacing="40.0">

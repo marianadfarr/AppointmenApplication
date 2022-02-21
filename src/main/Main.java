@@ -13,6 +13,10 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    /**Starts our application
+     * @param stage first stage
+     * @throws Exception if application fails to load
+     */
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -25,12 +29,8 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        JDBC.openConnection();//only call this once, use get connection for other
-//        DBCountries.CheckDateConversion();
+        JDBC.openConnection();//Only call this once, use get connection for other
         launch(args);
     }
 
-
 }
-
-//    JDBC.closeConnection(); //only call this at the end

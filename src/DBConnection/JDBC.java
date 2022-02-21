@@ -3,6 +3,9 @@ package DBConnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+/**
+ * Gets our database connection
+ */
 public abstract class JDBC {
     private static final String protocol = "jdbc";
     private static final String vendor = ":mysql:";

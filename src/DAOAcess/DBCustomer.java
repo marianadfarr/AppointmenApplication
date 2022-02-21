@@ -14,30 +14,31 @@ import java.time.format.DateTimeFormatter;
 
 import static javafx.collections.FXCollections.observableArrayList;
 
+/**
+ *This gets data for the Customers on the database.
+ */
 public class DBCustomer {
+    /** Returns all customers objects in the database.
+     * @return all customer list from the database.
+     */
     public static ObservableList<Customer> GetAllCustomers() {
-        ObservableList<Customer> AllCustomersList = observableArrayList(); // create list to add each object to
+        ObservableList<Customer> AllCustomersList = observableArrayList();
         try {
-            //try because we do not want to throw exceptions in the data access code //below is the FIELD LIST on the DB
-            // makes query for DB //need to be able to get country too
             String sql = "SELECT Customers.Customer_ID, Customers.Customer_Name, Customers.Address, Customers.Postal_Code, Customers.Phone," +
                     "first_level_divisions.Division, Countries.Country FROM Customers JOIN first_level_divisions  ON Customers.Division_ID = first_level_divisions.Division_ID" +
                     " JOIN Countries ON first_level_divisions.Country_ID = Countries.Country_ID";
 
 
-            PreparedStatement ps = JDBC.getConnection().prepareStatement(sql); //db connection,prepared statement
-            ResultSet allCustResults = ps.executeQuery(); // gets result set, on execute query
-            while (allCustResults.next()) { //loops through result set using next
-                int customerID = allCustResults.getInt("Customer_ID"); //gets id for app from DB- col label must match DB col
-                String customerName = allCustResults.getString("Customer_Name"); //gets title from DB
+            PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
+            ResultSet allCustResults = ps.executeQuery();
+            while (allCustResults.next()) {
+                int customerID = allCustResults.getInt("Customer_ID");
+                String customerName = allCustResults.getString("Customer_Name");
                 String customerAddress = allCustResults.getString("Address");
                 String customerpostalCode = allCustResults.getString("Postal_Code");
                 String customerPhone = allCustResults.getString("Phone");
                 String countryName = allCustResults.getString("Country");
                 String divisionName = allCustResults.getString("Division");
-
-
-                //takes all data for one loop and makes new object as per constructor defined in model class
 
                 Customer customer = new Customer(customerID, customerName, customerAddress, customerpostalCode, customerPhone, countryName, divisionName);
 
@@ -46,42 +47,60 @@ public class DBCustomer {
 
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace(); //print errors if any.
+            throwables.printStackTrace();
         }
-        return AllCustomersList; //return all customer list
+        return AllCustomersList;
     }
 
+    /** Creates a new customer object
+     * @param name customer name
+     * @param address customer address
+     * @param postalCode customer postal code
+     * @param phoneNumber customer phone number
+     * @param DivisionID customer's division ID
+     * @return true if created in DB, false otherwise.
+     * @throws SQLException if customer fails to be added
+     */
     public static Boolean CreateCustomer(String name, String address, String postalCode,
                                          String phoneNumber, int DivisionID) throws SQLException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String sqlcommand = "INSERT INTO customers (Customer_Name, Address, Postal_Code, Phone, Create_Date, Created_By, " +
-                "Last_Update, Last_Updated_By, Division_ID) \n" +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        //db connection,prepared statement
-        PreparedStatement sql = JDBC.getConnection().prepareStatement(sqlcommand);
+        DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String sqlcommand = "INSERT INTO customers (Customer_ID,Customer_Name, Address, Postal_Code, Phone, Create_Date, Created_By, " +
+                "Last_Update, Last_Updated_By, Division_ID) " +
+                "VALUES(NULL,?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        PreparedStatement sql = JDBC.getConnection().prepareStatement(sqlcommand,Statement.RETURN_GENERATED_KEYS);
 
         sql.setString(1, name);
         sql.setString(2, address);
         sql.setString(3, postalCode);
         sql.setString(4, phoneNumber);
-        sql.setString(5, ZonedDateTime.now(ZoneOffset.UTC).format(formatter).toString());
-        sql.setString(6, Session.getLoggedOnUser().getUserName());
-        sql.setString(7, ZonedDateTime.now(ZoneOffset.UTC).format(formatter).toString());
-        sql.setString(8, Session.getLoggedOnUser().getUserName());
+        sql.setString(5, ZonedDateTime.now(ZoneOffset.UTC).format(DTF));
+        sql.setString(6, Session.getCurrentUser().getUserName());
+        sql.setString(7, ZonedDateTime.now(ZoneOffset.UTC).format(DTF));
+        sql.setString(8, Session.getCurrentUser().getUserName());
         sql.setInt(9, DivisionID);
-        //only need to do division ID because we're adding to database
-        // Execute query
+
         try {
-            sql.executeUpdate();
+            sql.execute();
+            ResultSet resultset = sql.getGeneratedKeys();
+            resultset.next();
             return true;
         } catch (SQLException e) {
-            //TODO- log error??
             e.printStackTrace();
             return false;
         }
 
     }
 
+    /** Updates an existing customer object
+     * @param divisionName Name of division
+     * @param customerName Name of customer
+     * @param customerAddress Customer address
+     * @param customerpostalCode customer Postal Code
+     * @param customerPhone customer Phone
+     * @param customerID customer ID
+     * @return true if updated in DB, false otherwise
+     * @throws SQLException if customer was not updated in DB
+     */
     public static Boolean updateCustomer(String divisionName, String customerName, String customerAddress,
                                          String customerpostalCode, String customerPhone, Integer customerID) throws SQLException {
 
@@ -96,18 +115,16 @@ public class DBCustomer {
         ps.setString(2, customerAddress);
         ps.setString(3, customerpostalCode);
         ps.setString(4, customerPhone);
-        ps.setString(5, ZonedDateTime.now(ZoneOffset.UTC).format(formatter).toString());
-        ps.setString(6, Session.getLoggedOnUser().getUserName());
+        ps.setString(5, ZonedDateTime.now(ZoneOffset.UTC).format(formatter));
+        ps.setString(6, Session.getCurrentUser().getUserName());
         ps.setInt(7, DBCustomer.getDivisionID(divisionName));
         ps.setInt(8, customerID);
-//all fields for thr question mark
-        // Execute query
+
         try {
             ps.executeUpdate();
             ps.close();
             return true;
         } catch (SQLException e) {
-            //TODO- log error
             e.printStackTrace();
             ps.close();
             return false;
@@ -115,12 +132,17 @@ public class DBCustomer {
 
     }
 
+    /**Takes a division name and returns the DivisionID
+     * @param division Division name
+     * @return divisionID corresponding Division ID
+     * @throws SQLException if no such division name is found in DB
+     */
 
     public static Integer getDivisionID(String division) throws SQLException {
         Integer divisionID = 0;
         String sql = "SELECT Division, Division_ID FROM first_level_divisions WHERE Division = ?";
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
-        ps.setString(1, division); //this is for the questionmark
+        ps.setString(1, division);
 
         ResultSet result = ps.executeQuery();
 
@@ -132,12 +154,17 @@ public class DBCustomer {
 
     }
 
+    /**Takes a country and returns its associated first-level-divisions in an Observable List
+     * @param targetCountry Country
+     * @return targetDivisions, divisions associated with that country
+     * @throws SQLException if no such country is found.
+     */
     public static ObservableList<String> getDivisions(String targetCountry) throws SQLException {
 
         ObservableList<String> targetDivisions = FXCollections.observableArrayList();
 
         String sql = "SELECT Countries.Country, Countries.Country_ID," +
-                "first_level_divisions.Country_ID," + //i edited the sql
+                "first_level_divisions.Country_ID," +
                 "first_level_divisions.Division FROM Countries RIGHT OUTER JOIN" +
                 " first_level_divisions ON Countries.Country_ID = first_level_divisions.Country_ID WHERE Countries.Country= ?";
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
@@ -154,7 +181,10 @@ public class DBCustomer {
     }
 
 
-    //get all customer iDs
+    /**Gets all customerIDs to populate the customerID combo box
+     * @return allCustomerIDs Observable List
+     * @throws SQLException if database fails to retrieve list
+     */
     public static ObservableList<Integer> getAllCustomerIDs() throws SQLException {
 
         ObservableList<Integer> allCustomerIDs = FXCollections.observableArrayList();
@@ -170,6 +200,10 @@ public class DBCustomer {
 
     }
 
+    /** Gets all countries in the database to populate combo box
+     * @return AllCountries
+     * @throws SQLException if database fails to retrieve countries.
+     */
     public static ObservableList<String> GetAllCountries() throws SQLException {
 
         ObservableList<String> AllCountries = FXCollections.observableArrayList();
@@ -184,14 +218,21 @@ public class DBCustomer {
         return AllCountries;
 
     }
+
+    /** Get an observable list of all customer appointments for one customer, if any.
+     This is to validate not deleting a customer before all of their appointments are deleted.
+     * @param CustomerID  specific customer ID
+     * @return CustomerAppointments ObservableList
+     * @throws SQLException
+     */
     public static ObservableList<Appointment> getAllAppointmentsForCustomer(Integer CustomerID) throws SQLException {
-        //get an observable list of all customer appointments for one customer, if any.
+
         ObservableList<Appointment> CustomerApppointments = FXCollections.observableArrayList();
         String sql = "SELECT * FROM Appointments JOIN contacts ON Appointments.Contact_ID = " +
                 "Contacts.Contact_ID WHERE Customer_ID = ?";
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
 
-        ps.setInt(1, CustomerID); //first question mark
+        ps.setInt(1, CustomerID);
 
         ResultSet results = ps.executeQuery();
 
@@ -213,7 +254,6 @@ public class DBCustomer {
             Integer contactID = results.getInt("Contact_ID");
             String contactName = results.getString("Contact_Name");
 
-            // populate into an appt object
             Appointment newAppt = new Appointment(
                     appointmentID, title, description, location, type, startDateTime, endDateTime, createdDate,
                     createdBy, lastUpdateDateTime, lastUpdatedBy, customerID, userID, contactID, contactName
@@ -223,23 +263,25 @@ public class DBCustomer {
         return CustomerApppointments;
     }
 
+    /** Given a customer ID, delete the customer object.
+     * @param customerID
+     * @return true if deleted, false otherwise.
+     * @throws SQLException if no such customer ID exists.
+     */
     public static Boolean DeleteCustomer(Integer customerID) throws SQLException {
         String sql = "DELETE FROM Customers WHERE Customer_ID = ?";
         PreparedStatement ps = JDBC.getConnection().prepareStatement(sql);
-        ps.setInt(1, customerID); //this is for the questionmark
+        ps.setInt(1, customerID);
         try {
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            //TODO- log error
+
             e.printStackTrace();
             return false;
         }
     }
 }
 
-    //Create
-    //Read
-    //Update
-    //delete
+
 

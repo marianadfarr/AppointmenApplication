@@ -44,7 +44,7 @@
             <TextField fx:id="Description" prefHeight="32.0" prefWidth="385.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <TextField fx:id="Location" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label prefHeight="20.0" prefWidth="129.0" text="Type" GridPane.rowIndex="5" />
-            <Label prefHeight="20.0" prefWidth="295.0" text="Start Time (HH:mm:ss)" GridPane.rowIndex="7" />
+            <Label prefHeight="20.0" prefWidth="295.0" text="Start Time (HH:mm)" GridPane.rowIndex="7" />
             <Label text="Custumer ID" GridPane.rowIndex="9" />
             <Label text="User ID" GridPane.rowIndex="10" />
             <TextField fx:id="Type" GridPane.columnIndex="1" GridPane.rowIndex="5" />
@@ -55,7 +55,7 @@
             <ComboBox fx:id="CustomerIDComboBox" prefWidth="150.0" promptText="Customer ID" GridPane.columnIndex="1" GridPane.rowIndex="9" />
             <ComboBox fx:id="UserIDComboBox" prefWidth="150.0" promptText="User ID" GridPane.columnIndex="1" GridPane.rowIndex="10" />
             <TextField fx:id="endTime" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-            <Label prefHeight="23.0" prefWidth="300.0" text="End Time (HH:mm:ss)" GridPane.rowIndex="8" />
+            <Label prefHeight="23.0" prefWidth="300.0" text="End Time (HH:mm)" GridPane.rowIndex="8" />
             <DatePicker fx:id="DatePicker" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <Label text="Date" GridPane.rowIndex="6" />
          </children>

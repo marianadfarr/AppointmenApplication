@@ -6,40 +6,40 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.*;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+
 import java.time.ZoneId;
 import java.util.*;
 
 public class Session {
 
-    private static User loggedOnUser;
+    private static User currentUser;
     private static Locale userLocale;
     private  static ZoneId userTimeZone;
 
+
     /**
-     * attemptLogon
-     * Takes input username and password and checks them against DB to logon
+     Takes input username and password and checks them against DB to logon
+     * @param username username
+     * @param userpassword user password
+     * @return boolean true/false if logged in or not
+     * @throws SQLException DB connection fails
      *
-     * @param userName     user input username
-     * @param userPassword user input password
-     * @return Boolean indicating a successful logon
-     * @throws SQLException
-     */
-    public static boolean LogonAttempt(String userName, String userPassword) throws SQLException {
-        Connection conn = JDBC.getConnection();
-        PreparedStatement sqlCommand = conn.prepareStatement("SELECT * FROM users WHERE " +
-                "User_Name = ? AND Password = ?");
-        sqlCommand.setString(1, userName);
-        sqlCommand.setString(2, userPassword);
+     *
+     *     */
+
+    public static boolean LogonAttempt(String username, String userpassword) throws SQLException {
+        Connection connection = JDBC.getConnection();
+        PreparedStatement sqlCommand = connection.prepareStatement("SELECT * FROM Users WHERE User_Name = ? AND Password = ?");
+        sqlCommand.setString(1, username);
+        sqlCommand.setString(2, userpassword);
         ResultSet loginresult = sqlCommand.executeQuery();
         if (!loginresult.next()) {
 
             return false;
 
-            //Log failed login attempt
 
         } else {
-            loggedOnUser = new User(loginresult.getString("User_Name"), loginresult.getInt("User_ID"));
+            currentUser = new User(loginresult.getString("User_Name"), loginresult.getInt("User_ID"));
             userLocale = Locale.getDefault();
             userTimeZone = ZoneId.systemDefault();
             System.out.println("Logged in");
@@ -51,30 +51,34 @@ public class Session {
     }
 
     /**
-     * Getter - user Object
      *
-     * @return logged on user object
+     * @return user's time zone
      */
-    public static User getLoggedOnUser() {
-        return loggedOnUser;
+    public static ZoneId getUserTimeZone() {
+
+        return userTimeZone;
     }
 
     /**
-     * Getter - user Locale
      *
-     * @return locale of logged on user
+     * @return current user
+     */
+
+    public static User getCurrentUser() {
+        ;
+        return currentUser;
+    }
+
+
+    /**
+     *
+     * @return user Locale
      */
     public static Locale getUserLocale() {
         return userLocale;
 
     }
 
-    /**
-     * Getter - user Time Zone
-     *
-     * @return logged on user time zone
-     */
-    public static ZoneId getUserTimeZone() {
-        return userTimeZone;
-    }
+
+
 }

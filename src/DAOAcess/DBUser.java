@@ -1,5 +1,4 @@
 package DAOAcess;
-
 import DBConnection.JDBC;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,15 +7,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * This gets data for the user on the DB
+ */
 public class DBUser {
-    //do not create any
-//not sure if needed
-    //Create
-    //Read
-    //Update
-    //delete
 
-    //get all user IDs
+    /**Find all User IDs from database to populate combo boxes
+     * @return all user IDs for combo boxes
+     * @throws SQLException if database fails to load.
+     */
     public static ObservableList<Integer> getAllUserIDs() throws SQLException {
         ObservableList<Integer> AllUserIDs = FXCollections.observableArrayList();
 

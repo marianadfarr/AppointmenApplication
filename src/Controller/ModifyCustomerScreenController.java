@@ -1,8 +1,7 @@
 package Controller;
 
-import DAOAcess.DBCountries;
+
 import DAOAcess.DBCustomer;
-import Model.Countries;
 import Model.Customer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +18,9 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+/**
+ * Provides logic to the Edit Customer screen page.
+ */
 public class ModifyCustomerScreenController implements Initializable {
     Stage stage;
     Parent scene;
@@ -51,9 +53,18 @@ public class ModifyCustomerScreenController implements Initializable {
     @FXML
     private Button SaveButton;
 
-
+    /**
+     * Saves a new customer to the database.
+     * @param event clicking the save button.
+     * Checks for blank or unselected inputs, and if all have been entered, a customer object is added to the database.
+     * User is then directed to the customer page.
+     *
+     *
+     * @throws SQLException if customer was not saved to database
+     * @throws IOException if no such file exists
+     */
     @FXML
-    void OnActionSaveCustomer(ActionEvent event) throws SQLException, IOException {//exception just in case this FXML file doesn't exist , input output error
+    void OnActionSaveCustomer(ActionEvent event) throws SQLException, IOException {
 
         String name = ModifyName.getText();
         String address = ModifyAddress.getText();
@@ -63,9 +74,8 @@ public class ModifyCustomerScreenController implements Initializable {
         String division = ModifyDivision.getValue();
         Integer customerID = Integer.parseInt(ModifyID.getText());
 
-        if (name.isBlank() || address.isBlank() || postalCode.isBlank() ||
-                phone.isBlank() || country.isBlank() || division.isBlank()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Please ensure all fields are completed before saving customer");
+        if (name.isBlank() || address.isBlank() || postalCode.isBlank() || phone.isBlank() ||country==null || division == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Please ensure all fields are completed or selected before saving customer");
             alert.showAndWait();
             return;
 
@@ -88,23 +98,37 @@ public class ModifyCustomerScreenController implements Initializable {
 
 
 
-    } //back button
+    }
+
+    /**Directs user to the main screen.
+     * @param event Clicking the main menu screen.
+     * User is alerted any changes made will be lost.
+     * After they confirm, user is directed to the customer screen.
+     * @throws IOException if no such files exists
+     */
     @FXML
-    void OnActionMainScreen(ActionEvent event) throws IOException { //exception just in case this FXML file doesn't exist , input output error
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Any changes made will be lost. Proceed?"); //alert is an overloaded method
+    void OnActionMainScreen(ActionEvent event) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Any changes made will be lost. Proceed?");
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-            scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
-            stage.setScene(new Scene(scene)); //load the scene to the stage
-            stage.show(); //this will bring us to the appropriate screen (main Menu
+            scene = FXMLLoader.load(getClass().getResource("/view/CustomerScreen.fxml"));
+            stage.setScene(new Scene(scene));
+            stage.show();
         }
     }
+
+    /** Sets all data from the selected user onto the screen.
+     Lambda expression: Add a listener for the combo box for country changing,
+     which changes the choices in the division combo box accordingly.
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
             ModifyCountry.setPromptText("Choose a Country");
-            ModifyDivision.setPromptText("Choose a State/Province"); //fixme prompt text not showing
+            ModifyDivision.setPromptText("Choose a State/Province");
             CustomerToEdit = CustomerScreenController.getCustomerToEdit();
             ModifyID.setText(String.valueOf(CustomerToEdit.getCustomerID()));
             ModifyName.setText(CustomerToEdit.getCustomerName());
@@ -121,20 +145,25 @@ public class ModifyCustomerScreenController implements Initializable {
             catch (SQLException e) {
                 e.printStackTrace();
             }
-
-        ModifyCountry.valueProperty().addListener((obs, OldValue, NewValue) -> {
+/**
+Lambda expression here- listener for the combo box for country changing,
+ which changes the choices in the division combo box accordingly.
+ */
+        ModifyCountry.valueProperty().addListener((observableValue, OldValue, NewValue) -> {
             if (NewValue == null) {
-                ModifyDivision.getItems().clear();
+                ModifyDivision.setValue(null);
                 ModifyDivision.setPromptText("Choose a State/Province");
 
             } else {
                 try {
                     ModifyDivision.setPromptText("Choose a State/Province");
                     ModifyDivision.setItems(DBCustomer.getDivisions(ModifyCountry.getValue()));
-                    ModifyDivision.setPromptText("Choose a State/Province");
+
                 } catch (SQLException e) {
                     e.printStackTrace();
 
                 }
             }
         });}}
+
+

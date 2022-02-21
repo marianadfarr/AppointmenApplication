@@ -1,12 +1,8 @@
 package Controller;
 
 import DAOAcess.DBAppointment;
-import DAOAcess.DBCustomer;
-import DBConnection.JDBC;
+
 import Model.Appointment;
-import Model.Customer;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,10 +15,14 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.PreparedStatement;
+
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
+/**
+ * Handles the logic for the main page of the application.
+ */
+import static DAOAcess.DBAppointment.GetAllAppointments;
 
 public class MainScreenController implements Initializable {
 
@@ -59,95 +59,102 @@ public class MainScreenController implements Initializable {
     @FXML
     private TableColumn<Appointment, Integer> userIDcol;
 
+    @FXML
+    private ToggleGroup ToggleGroup;
 
-    ObservableList<Appointment> AppointmentObservableList = FXCollections.observableArrayList();
+    @FXML
+    private RadioButton AllApptToggle;
+
+    @FXML
+    private RadioButton MonthViewToggle;
+
+    @FXML
+    private RadioButton WeekViewToggle;
+
 
     Stage stage;
     Parent scene;
+    /** Appointment Selected (to modify/delete
+     *
+     */
+    private static Appointment AppointmentSelected;
 
-    private static int AppointmentSelected; //AppointmentID to delete
+    /**Returns appointment selected (to modify/delete)
+     * @return AppointmentSelected
+     */
+    public static Appointment getAppointmentSelected() {
 
-    public static int getSelectedAppointment() {
         return AppointmentSelected;
     }
 
-    private static String AppointmentType;
+    /**Shows all Appointments in Table View
+     * @param event  Radio button selection returns all appointments
+     * @throws SQLException if DB did not grab appointments
+     */
+    @FXML
+    void OnActionAllAppointments(ActionEvent event) throws SQLException {
+        AppointmentTableView.setItems(GetAllAppointments());
 
-    public static String getAppointmentType() {
-        return AppointmentType;
     }
-    private static Appointment AppointmentToEdit;
-    public static Appointment getAppointmentToEdit() {
-        return AppointmentToEdit;
+
+    /**
+     * Shows this month's appointments only.
+     * @param event Radio button selection returns only this month's appointments
+     * @throws SQLException if database did not grab appointments
+     */
+    @FXML
+    void OnActionMonthAppointments(ActionEvent event) throws SQLException {
+        AppointmentTableView.setItems(DBAppointment.GetAllMonthAppointments());
+
     }
 
-
-
-
-
-
+    /** Shows this week's appointments only.
+     * @param event Radio button selection returns only this week's appointments
+     * @throws SQLException if database did not grab appointments.
+     */
 
     @FXML
-    void OnActionCreateAppointment(ActionEvent event) throws IOException { //exception just in case this FXML file doesn't exist , input output error
+    void OnActionWeekAppointments(ActionEvent event) throws SQLException {
+        AppointmentTableView.setItems(DBAppointment.GetAllWeekAppointments());
+    }
+
+    /**Create appointment - switches screen to add appointment.
+     * @param event Clicking on the create appointment button leads us to the "Add Appointment" screen
+     * @throws IOException if no such page exists.
+     */
+
+    @FXML
+    void OnActionCreateAppointment(ActionEvent event) throws IOException {
         stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         scene = FXMLLoader.load(getClass().getResource("/View/AddAppointmentScreen.fxml"));
         stage.setScene(new Scene(scene));
         stage.show();
     }
 
+    /** Switch to the customer screen
+     * @param event Clicking on the Customers button leads us to the all customer screen
+     * @throws IOException if no such page exists
+     */
     @FXML
-    void OnActionCustomer(ActionEvent event) throws IOException { //exception just in case this FXML file doesn't exist , input output error
+    void OnActionCustomer(ActionEvent event) throws IOException {
         stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         scene = FXMLLoader.load(getClass().getResource("/View/CustomerScreen.fxml"));
         stage.setScene(new Scene(scene));
         stage.show();
     }
-    @FXML
-    void OnActionCountries(ActionEvent event) throws IOException { //exception just in case this FXML file doesn't exist , input output error
-        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/View/countrytest.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-    }
-    @FXML
-    void MonthViewAppointments(ActionEvent event) {
-        System.out.println("Placeholder");
-    }
 
-
-    @FXML
-    void WeekViewAppointments(ActionEvent event) {
-        System.out.println("Placeholder");
-
-    }
-    @FXML
-    void OnActionDeleteAppointment(ActionEvent event) throws IOException, SQLException {
-        AppointmentSelected = AppointmentTableView.getSelectionModel().getSelectedItem().getAppointmentID();
-        AppointmentType= AppointmentTableView.getSelectionModel().getSelectedItem().getType();
-//appoitnment to delete ID
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "This will delete the appointment. Are you sure you want to proceed?"); //alert is an overloaded method
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            DBAppointment.DeleteAppointment(AppointmentSelected);
-
-        }
-
-        //it will return a boolean if there's a button inside optional container and if it is the ok button
-        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/View/MainScreen.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-
-        Alert alert1 = new Alert(Alert.AlertType.INFORMATION, "You have successfully deleted the appointment with ID  " + AppointmentSelected +  "  and Type  " + AppointmentType ); //alert is an overloaded method
-        Optional<ButtonType> result1 = alert1.showAndWait();
-    }
+    /** Updating a selected appointment
+     * @param event clicking on the update button
+     * @throws IOException if no appointment was selected beforehand
+     */
 
     @FXML
     void OnActionUpdateAppointment(ActionEvent event) throws IOException {
-        AppointmentToEdit = AppointmentTableView.getSelectionModel().getSelectedItem();
-        if (AppointmentToEdit == null) {
+        AppointmentSelected = AppointmentTableView.getSelectionModel().getSelectedItem();
+        if (AppointmentSelected == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "No appointment selected."); //alert is an overloaded method
             Optional<ButtonType> result = alert.showAndWait();
+            return;
         } else {
             stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
             scene = FXMLLoader.load(getClass().getResource("/View/ModifyAppointmentScreen.fxml"));
@@ -156,50 +163,75 @@ public class MainScreenController implements Initializable {
 
         }
     }
+
+    /**
+     * Delete a selected appointment
+     * @param event clicking on the delete appointment button.
+     * @throws IOException if no appointment was selected beforehand.
+     * @throws SQLException if no appointment was deleted.
+     */
+    @FXML
+    void OnActionDeleteAppointment(ActionEvent event) throws IOException, SQLException {
+        AppointmentSelected = AppointmentTableView.getSelectionModel().getSelectedItem();
+        if (AppointmentSelected == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "No appointment selected."); //alert is an overloaded method
+            Optional<ButtonType> result = alert.showAndWait();
+            return;
+        }
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "This will delete the appointment. Are you sure you want to proceed?");
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            DBAppointment.DeleteAppointment(AppointmentSelected.getAppointmentID());
+
+            Alert alert1 = new Alert(Alert.AlertType.INFORMATION, "You have successfully deleted the appointment with ID:  " + AppointmentSelected.getAppointmentID()+ "  and Type: " + AppointmentSelected.getType());
+            Optional<ButtonType> result1 = alert1.showAndWait();
+            stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+            scene = FXMLLoader.load(getClass().getResource("/View/MainScreen.fxml"));
+            stage.setScene(new Scene(scene));
+            stage.show();
+        }
+
+
+    }
+
+    /** Brings user to the Reports page
+     * @param event clicking the Reports button, leads to the reports page.
+     * @throws IOException if no such page exists.
+     */
+    @FXML
+    void OnActionReports(ActionEvent event) throws IOException {
+        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+        scene = FXMLLoader.load(getClass().getResource("/View/Reports.fxml"));
+        stage.setScene(new Scene(scene));
+        stage.show();
+
+    }
+
+    /** Sets all objects returned from GetAllAppointments(),which is an Observable List of appointment objects.
+     * @param url
+     * @param resourceBundle
+     */
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-// sets all the objects returned from GetAllAppointments(), which is an OL of appointment objects.
         try {
-            AppointmentTableView.setItems(DBAppointment.GetAllAppointments()); //set all appointments according to variable name of constructor
+            AppointmentTableView.setItems(GetAllAppointments());//set all appointments according to variable name of constructor
+            IDCol.setCellValueFactory(new PropertyValueFactory<>("appointmentID"));
+            titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+            DescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+            locationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
+            ContactCol.setCellValueFactory(new PropertyValueFactory<>("contactName"));
+            TypeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+            startCol.setCellValueFactory(new PropertyValueFactory<>("startDatetime")); //has to match getter in capitalization
+            endCol.setCellValueFactory(new PropertyValueFactory<>("endDatetime"));
+            customerCol.setCellValueFactory(new PropertyValueFactory<>("CustomerID"));
+            userIDcol.setCellValueFactory(new PropertyValueFactory<>("UserID"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        IDCol.setCellValueFactory(new PropertyValueFactory<>("appointmentID"));
-        titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
-        DescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
-        locationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
-        ContactCol.setCellValueFactory(new PropertyValueFactory<>("contactName"));
-        TypeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        startCol.setCellValueFactory(new PropertyValueFactory<>("startDatetime")); //has to match getter in capitalization
-        endCol.setCellValueFactory(new PropertyValueFactory<>("endDatetime"));
-        customerCol.setCellValueFactory(new PropertyValueFactory<>("CustomerID"));
-        userIDcol.setCellValueFactory(new PropertyValueFactory<>("UserID"));
-
     }
 }
-    //PropertyValueFactory<Appointment, Integer> apptIDFactory = new PropertyValueFactory<>("AppointmentID");
-//        AppointmentIDCol.setCellValueFactory(apptIDFactory);
-//
-//        PropertyValueFactory<Appointment, String> apptTitleFactory = new PropertyValueFactory<>("Title");
-//        titleCol.setCellValueFactory(apptTitleFactory);
-//
-//        PropertyValueFactory<Appointment, String> apptDescriptionFactory = new PropertyValueFactory<>("Description");
-//        DescriptionCol.setCellValueFactory(apptDescriptionFactory);
-//
-//        PropertyValueFactory<Appointment, String> apptLocationFactory = new PropertyValueFactory<>("Location");
-//        locationCol.setCellValueFactory(apptLocationFactory);
-//
-//        PropertyValueFactory<Appointment, Integer> apptContactFactory = new PropertyValueFactory<>("ContactID");
-//        ContactCol.setCellValueFactory(apptContactFactory);
-//
-//        PropertyValueFactory<Appointment, String> apptTypeFactory = new PropertyValueFactory<>("Type");
-//        TypeCol.setCellValueFactory(apptTypeFactory);
-//
-//        PropertyValueFactory<Appointment, String> apptStartFactory = new PropertyValueFactory<>("StartTime");
-//        startCol.setCellValueFactory(apptStartFactory); //fixme being a string can cause issues
-//
-//        PropertyValueFactory<Appointment, String> apptEndFactory = new PropertyValueFactory<>("EndTime");
-//        endCol.setCellValueFactory(apptEndFactory); //fixme being a string can cause issues
-//
-//        PropertyValueFactory<Appointment, Integer> apptCustomerID = new PropertyValueFactory<>("CustomerID");
-//        customerCol.setCellValueFactory(apptCustomerID);
+
+
+

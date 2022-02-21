@@ -37,10 +37,9 @@
       <HBox alignment="BOTTOM_RIGHT" layoutX="376.0" layoutY="330.0" prefHeight="42.0" prefWidth="198.0" spacing="40.0">
          <children>
             <Button fx:id="EnterButton" mnemonicParsing="false" onAction="#OnActionAuthenticate" prefHeight="17.0" prefWidth="72.0" text="Enter" />
-            <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="13.0" prefWidth="69.0" text="?" />
          </children>
       </HBox>
-      <Label fx:id="TimeZoneLabel" layoutX="182.0" layoutY="502.0" text="Your time Zone: " />
+      <Label fx:id="TimeZoneLabel" layoutX="182.0" layoutY="502.0" text="Your Time Zone: " />
       <Label fx:id="TimeZoneInsert" layoutX="333.0" layoutY="502.0" text="[time zone here]" />
    </children>
 </AnchorPane>
