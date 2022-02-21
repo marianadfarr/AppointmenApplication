@@ -21,5 +21,7 @@ Open the folder in IntelliJ IDEA. Update the path to JDBC, JavaFX SDK,  and JDK.
 Lambda Expressions:
 In the Add Customer screen and Update Customer screen, lambda expression allows users to see only related first-level divisions in the combo box after choosing a country in the country combo box.
 In the Add Appointment screen and  Update Appointment screen, the Date picker is disabled for any days before today to prevent users from making appointments in the past.
+
+
 Additional report created:
 I created a report showing a count of how many customers were located in the three countries provided in the database. This gives insight to the company as to where the majority of their customer base is located. Keeping track of these numbers over time can track the changing demographic  of the customers. 
