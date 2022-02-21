@@ -1,6 +1,5 @@
 “AppointmentKeeper” Application-  By Mariana Farr 02/13/2022
 
-Contact: mfarr4@wgu.edu
 
 IDE:IntelliJ IDEA Community Edition 2021.1.1
 
